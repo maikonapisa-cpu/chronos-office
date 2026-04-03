@@ -1,6 +1,7 @@
 /**
  * Content Composer for Cade
  * Generates draft posts from verified stories
+ * Tier-ranked composition with source preservation
  */
 
 export interface DraftCandidate {

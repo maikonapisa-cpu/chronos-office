@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "OpenClaw Office",
-  description: "Multi-agent assistant platform",
+  description: "Multi-agent assistant platform - Production",
 };
 
 export default function RootLayout({

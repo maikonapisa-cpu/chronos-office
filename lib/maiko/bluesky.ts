@@ -128,15 +128,15 @@ class BlueskyClient {
   }
 }
 
-// Singleton instance
-const client = new BlueskyClient();
-
+// Create fresh client for each request (serverless environment)
 export async function postToBluesky(text: string): Promise<BlueskyPost> {
+  const client = new BlueskyClient();
   return client.post(text);
 }
 
 export async function postBatchToBluesky(
   posts: string[]
 ): Promise<BlueskyPost[]> {
+  const client = new BlueskyClient();
   return client.postBatch(posts);
 }

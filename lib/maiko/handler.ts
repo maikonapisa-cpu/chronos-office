@@ -225,38 +225,22 @@ export async function handleMaikoCommand(
     // 6. Post Tier A to Bluesky (ALWAYS post Tier A to Bluesky)
     const posted_uris: string[] = [];
     const targetPlatforms = request.target_platforms || ["bluesky"];
-    console.log(
-      `[Maiko] Attempting to post ${publishing_packet.publish_now.length} posts to platforms:`,
-      targetPlatforms
-    );
     if (
       publishing_packet.publish_now.length > 0 &&
       targetPlatforms.includes("bluesky")
     ) {
       try {
-        console.log("[Maiko] Posting to Bluesky enabled, processing posts...");
         for (const post of publishing_packet.publish_now) {
-          console.log(`[Maiko] Posting: ${post.post_text.substring(0, 50)}...`);
           const result = await postToBluesky(post.post_text);
-          console.log(`[Maiko] Posted successfully, URI: ${result.uri}`);
           posted_uris.push(result.uri);
           // Add URI to post record
           (post as any).bluesky_uri = result.uri;
         }
-        console.log(`[Maiko] Successfully posted ${posted_uris.length} posts to Bluesky`);
       } catch (error) {
         console.error("[Maiko Bluesky Error]", error);
-        console.error("[Maiko] Error details:", {
-          message: error instanceof Error ? error.message : String(error),
-          stack: error instanceof Error ? error.stack : undefined,
-        });
         // Don't fail the whole request if posting fails
         // Return the decisions anyway
       }
-    } else {
-      console.log(
-        `[Maiko] Skipping Bluesky posting: publish_now.length=${publishing_packet.publish_now.length}, bluesky_included=${targetPlatforms.includes("bluesky")}`
-      );
     }
 
     // 7. Return success response

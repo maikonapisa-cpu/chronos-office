@@ -6,6 +6,7 @@
 import { parsePublishIntent, type ParsedPublishIntent } from "./parser";
 import { selectAndEditDrafts } from "./publisher";
 import { formatPublishingPacket, generatePublishBrief } from "./formatter";
+import { postToBluesky } from "./bluesky";
 
 // ============================================================================
 // Request/Response Interfaces
@@ -221,7 +222,27 @@ export async function handleMaikoCommand(
     const publishing_packet = formatPublishingPacket(decisions, request);
     const brief = generatePublishBrief(publishing_packet, intent);
 
-    // 6. Return success response
+    // 6. Post Tier A to Bluesky (if auto_publish OR auto-publishing Tier A)
+    const posted_uris: string[] = [];
+    if (
+      publishing_packet.publish_now.length > 0 &&
+      request.target_platforms?.includes("bluesky")
+    ) {
+      try {
+        for (const post of publishing_packet.publish_now) {
+          const result = await postToBluesky(post.post_text);
+          posted_uris.push(result.uri);
+          // Add URI to post record
+          (post as any).bluesky_uri = result.uri;
+        }
+      } catch (error) {
+        console.error("[Maiko Bluesky Error]", error);
+        // Don't fail the whole request if posting fails
+        // Return the decisions anyway
+      }
+    }
+
+    // 7. Return success response
     return {
       ok: true,
       action: "publish",

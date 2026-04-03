@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
       action: body.action || "publish",
       query: body.query,
       posting_packet: body.posting_packet,
-      target_platforms: body.target_platforms,
+      target_platforms: body.target_platforms || ["bluesky"],
       approval_required: body.approval_required !== false,
       auto_publish: body.auto_publish || false,
       auto_reply: body.auto_reply || false,

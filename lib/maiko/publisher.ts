@@ -85,27 +85,21 @@ export async function selectAndEditDrafts(
     // Decide bucket based on tier + confidence + freshness + mode
     const tier = detectDraftTier(posting_packet, draft);
 
+    // **MAIKO POSTS TO BLUESKY**: Tier A auto-publishes immediately (no approval gate)
     if (
       tier === "a" &&
       draft.confidence === "high" &&
       (draft.freshness === "same-day" || draft.freshness === "past_24h")
     ) {
-      // **AUTO-PUBLISH Tier A** (Option B)
-      if (intent.auto_publish || !request.approval_required) {
-        const selected = createSelectedPost(
-          draft,
-          "publish_now",
-          "Auto-publish: Tier A + high confidence + fresh",
-          score
-        );
-        decisions.publish_now.push(selected);
-        story_post_count.set(story_id, current_count + 1);
-      } else {
-        // approval_required=true → queue for review even though it's strong
-        const queued = createQueuedPost(draft, score, "strong_candidate");
-        decisions.queue.push(queued);
-        story_post_count.set(story_id, current_count + 1);
-      }
+      // Tier A → Always publish_now (Maiko will post to Bluesky)
+      const selected = createSelectedPost(
+        draft,
+        "publish_now",
+        "Auto-publish to Bluesky: Tier A + high confidence + fresh",
+        score
+      );
+      decisions.publish_now.push(selected);
+      story_post_count.set(story_id, current_count + 1);
     } else if (tier === "a" || tier === "b") {
       // Queue for review
       const queued = createQueuedPost(draft, score, `tier_${tier}`);

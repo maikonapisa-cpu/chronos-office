@@ -66,15 +66,6 @@ class BlueskyClient {
     try {
       // Create post record
       const now = new Date().toISOString();
-      const post = {
-        $type: "com.atproto.repo.createRecord",
-        repo: this.session.did,
-        collection: "app.bsky.feed.post",
-        record: {
-          text,
-          createdAt: now,
-        },
-      };
 
       const response = await fetch(
         `${this.pdsUrl}/xrpc/com.atproto.repo.createRecord`,
@@ -84,7 +75,14 @@ class BlueskyClient {
             "Content-Type": "application/json",
             Authorization: `Bearer ${this.session.accessJwt}`,
           },
-          body: JSON.stringify(post.record),
+          body: JSON.stringify({
+            repo: this.session.did,
+            collection: "app.bsky.feed.post",
+            record: {
+              text,
+              createdAt: now,
+            },
+          }),
         }
       );
 

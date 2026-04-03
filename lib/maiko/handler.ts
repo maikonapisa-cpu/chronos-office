@@ -222,11 +222,12 @@ export async function handleMaikoCommand(
     const publishing_packet = formatPublishingPacket(decisions, request);
     const brief = generatePublishBrief(publishing_packet, intent);
 
-    // 6. Post Tier A to Bluesky (if auto_publish OR auto-publishing Tier A)
+    // 6. Post Tier A to Bluesky (ALWAYS post Tier A to Bluesky)
     const posted_uris: string[] = [];
+    const targetPlatforms = request.target_platforms || ["bluesky"];
     if (
       publishing_packet.publish_now.length > 0 &&
-      request.target_platforms?.includes("bluesky")
+      targetPlatforms.includes("bluesky")
     ) {
       try {
         for (const post of publishing_packet.publish_now) {

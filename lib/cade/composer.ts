@@ -19,6 +19,18 @@ export interface DraftCandidate {
   risk_notes: string[];
 }
 
+export interface DraftBase {
+  source_item_id?: string;
+  angle_type?: string;
+  hook?: string;
+  text?: string;
+  rationale?: string;
+  confidence?: string;
+  freshness?: string;
+  source_list?: string[];
+  risk_notes?: string[];
+}
+
 /**
  * Compose draft posts from a research item
  */
@@ -41,11 +53,19 @@ export function composeDraftsFromItem(
       for (const draft of singleDrafts) {
         postCounter++;
         drafts.push({
-          ...draft,
           post_id: `${baseId}_single_${postCounter}`,
+          source_item_id: baseId,
           platform,
           format: "single_post",
+          angle_type: draft.angle_type || "",
+          hook: draft.hook || "",
+          text: draft.text || "",
+          rationale: draft.rationale || "",
+          confidence: draft.confidence || "medium",
+          freshness: draft.freshness || "past_24h",
           publish_priority: calculatePriority(item, "single", platform),
+          source_list: draft.source_list || [],
+          risk_notes: draft.risk_notes || [],
         });
       }
     }
@@ -58,12 +78,20 @@ export function composeDraftsFromItem(
       for (const draft of threadDrafts) {
         postCounter++;
         drafts.push({
-          ...draft,
           post_id: `${baseId}_thread_${postCounter}`,
+          source_item_id: baseId,
           platform,
           format: "thread",
+          angle_type: draft.angle_type || "",
+          hook: draft.hook || "",
+          text: draft.text || "",
+          rationale: draft.rationale || "",
+          confidence: draft.confidence || "medium",
+          freshness: draft.freshness || "past_24h",
           publish_priority:
             calculatePriority(item, "thread", platform) - 1,
+          source_list: draft.source_list || [],
+          risk_notes: draft.risk_notes || [],
         });
       }
     }
@@ -76,12 +104,20 @@ export function composeDraftsFromItem(
       for (const draft of replyDrafts) {
         postCounter++;
         drafts.push({
-          ...draft,
           post_id: `${baseId}_reply_${postCounter}`,
+          source_item_id: baseId,
           platform,
           format: "reply",
+          angle_type: draft.angle_type || "",
+          hook: draft.hook || "",
+          text: draft.text || "",
+          rationale: draft.rationale || "",
+          confidence: draft.confidence || "medium",
+          freshness: draft.freshness || "past_24h",
           publish_priority:
             calculatePriority(item, "reply", platform) - 2,
+          source_list: draft.source_list || [],
+          risk_notes: draft.risk_notes || [],
         });
       }
     }
@@ -94,11 +130,19 @@ export function composeDraftsFromItem(
       for (const draft of quoteDrafts) {
         postCounter++;
         drafts.push({
-          ...draft,
           post_id: `${baseId}_quote_${postCounter}`,
+          source_item_id: baseId,
           platform,
           format: "quote_post",
+          angle_type: draft.angle_type || "",
+          hook: draft.hook || "",
+          text: draft.text || "",
+          rationale: draft.rationale || "",
+          confidence: draft.confidence || "medium",
+          freshness: draft.freshness || "past_24h",
           publish_priority: calculatePriority(item, "quote", platform),
+          source_list: draft.source_list || [],
+          risk_notes: draft.risk_notes || [],
         });
       }
     }
@@ -110,8 +154,8 @@ export function composeDraftsFromItem(
 /**
  * Generate single-post drafts
  */
-function generateSinglePosts(item: any, baseId: string): Partial<DraftCandidate>[] {
-  const drafts: Partial<DraftCandidate>[] = [];
+function generateSinglePosts(item: any, baseId: string): DraftBase[] {
+  const drafts: DraftBase[] = [];
 
   // Angle 1: Direct/breaking
   if (item.headline) {
@@ -167,8 +211,8 @@ function generateSinglePosts(item: any, baseId: string): Partial<DraftCandidate>
 /**
  * Generate thread starter drafts
  */
-function generateThreadStarters(item: any, baseId: string): Partial<DraftCandidate>[] {
-  const drafts: Partial<DraftCandidate>[] = [];
+function generateThreadStarters(item: any, baseId: string): DraftBase[] {
+  const drafts: DraftBase[] = [];
 
   if (!item.headline) return drafts;
 
@@ -198,8 +242,8 @@ function generateThreadStarters(item: any, baseId: string): Partial<DraftCandida
 /**
  * Generate reply-style drafts
  */
-function generateReplies(item: any, baseId: string): Partial<DraftCandidate>[] {
-  const drafts: Partial<DraftCandidate>[] = [];
+function generateReplies(item: any, baseId: string): DraftBase[] {
+  const drafts: DraftBase[] = [];
 
   // Short reply: what happened
   if (item.headline) {
@@ -222,8 +266,8 @@ function generateReplies(item: any, baseId: string): Partial<DraftCandidate>[] {
 /**
  * Generate quote/commentary drafts
  */
-function generateQuoteCommentary(item: any, baseId: string): Partial<DraftCandidate>[] {
-  const drafts: Partial<DraftCandidate>[] = [];
+function generateQuoteCommentary(item: any, baseId: string): DraftBase[] {
+  const drafts: DraftBase[] = [];
 
   if (!item.headline) return drafts;
 
